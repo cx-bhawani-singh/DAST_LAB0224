@@ -1,0 +1,84 @@
+env:
+  contexts:
+  - name: Default Context
+    authentication:
+      parameters: {}
+      verification:
+        method: response
+        pollFrequency: 60
+        pollUnits: requests
+    urls:
+    - https://testfire.net/
+    excludePaths:
+    - .*\.(jpe?g|png|gif|bmp|ico|svg|webp|tiff?)$
+    - .*\.(pdf|ps|eps|ai|docx?|xlsx?|pptx?)$
+    - .*\.(mp[34]|m4[av]|wav|midi?|ogg|webm|flv|mov)$
+    - .*\.(zip|rar|7z|tar|gz|bz2)$
+    - .*\.(css|map)$
+    - .*\.(ttf|eot|woff2?)$
+    includePaths:
+    - https://testfire.net/.*
+    sessionManagement:
+      method: cookie
+      parameters: {}
+    technology:
+      exclude: []
+    users: []
+  parameters:
+    failOnError: true
+    failOnWarning: false
+    progressToStdout: true
+  vars: {}
+jobs:
+- name: passiveScan-config
+  parameters:
+    disableAllRules: false
+    enableTags: false
+    scanOnlyInScope: true
+  rules: []
+  type: passiveScan-config
+- name: spider
+  parameters:
+    context: Default Context
+    logoutAvoidance: true
+    maxChildren: 50
+    maxDepth: 5
+    maxDuration: 10
+    url: https://testfire.net/
+  type: spider
+- name: spiderAjax
+  parameters:
+    clickDefaultElems: true
+    context: Default Context
+    inScopeOnly: true
+    logoutAvoidance: true
+    maxCrawlDepth: 10
+    maxDuration: 10
+    numberOfBrowsers: 4
+    reloadWait: 1000
+    runOnlyIfModern: false
+    scopeCheck: Flexible
+    url: https://testfire.net/
+  type: spiderAjax
+- name: passiveScan-wait
+  parameters:
+    maxDuration: 2
+  type: passiveScan-wait
+- name: activeScan
+  parameters:
+    context: Default Context
+    maxRuleDurationInMins: 0
+    maxScanDurationInMins: 100
+    policy: Dev Standard
+    threadPerHost: 4
+  type: activeScan
+- alwaysRun: true
+  name: report
+  parameters:
+    displayReport: false
+    reportDescription: ""
+    reportDir: ""
+    reportFile: ""
+    reportTitle: ZAP Scanning Report
+    template: traditional-json-plus
+  type: report
