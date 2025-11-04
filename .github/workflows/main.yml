@@ -1,0 +1,29 @@
+jobs:
+  dast:
+    runs-on: ubuntu-latest
+    name: DAST Action
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Create Output folder
+        run: mkdir ${{ github.workspace }}/output_fold
+      - name: Change dast-config owner
+        run: sudo chmod 777 -R dast-config
+      - name: Run DAST-CLI command
+        run: |
+          docker run \
+           -e CX_APIKEY=eyJhbGciOiJIUzUxMiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI5MGY0ZTU5OS05YmRlLTRlYzAtYWNhNy04ZWM3NGE4Yzg5YmUifQ.eyJpYXQiOjE3NjIyMzk3MTQsImp0aSI6Ijk2ZWE5NDgzLWI4YjItNDhhZS05YTQ3LTk3MWQ2N2E2ZTNhNiIsImlzcyI6Imh0dHBzOi8vZGV1LmlhbS5jaGVja21hcngubmV0L2F1dGgvcmVhbG1zL2NoZWNrbWFyeC1nbG9iYWwtc2VydmljZXMtaW50ZXJuYWwiLCJhdWQiOiJodHRwczovL2RldS5pYW0uY2hlY2ttYXJ4Lm5ldC9hdXRoL3JlYWxtcy9jaGVja21hcngtZ2xvYmFsLXNlcnZpY2VzLWludGVybmFsIiwic3ViIjoiODczZjllNzAtNDEyMC00NjE4LTk4YjAtMjY4Zjg5OWNjMGZiIiwidHlwIjoiT2ZmbGluZSIsImF6cCI6ImFzdC1hcHAiLCJzaWQiOiI4MGI2MjNiYi02NDc1LTRiOWQtOTc3MS1kZTE0NmM3MjZiYjciLCJzY29wZSI6InByb2ZpbGUgaWFtLWFwaSBhc3QtYXBpIHJvbGVzIGVtYWlsIG9mZmxpbmVfYWNjZXNzIn0.th_cgsWASEgY5mKFJbImQ9PwR4lsZXt-hFXn_qcsXegBBcF8y9c2ONDZ74VjFNqHYF8oJjZgGkiVQAd8K_HbRA
+           -v ${{ github.workspace }}/output_fold:/output_fold:z \
+           -v ${{ github.workspace }}/dast-config:/dast-config:z \
+           checkmarx/dast:latest web \
+           --base-url=https://deu.ast.checkmarx.net \
+           --environment-id=09a469a0-cc79-4cdf-8660-252bf500a13b \
+           --config=/dast-config/testfire.yaml \
+           --output=/output_fold \
+           --timeout=10000 \
+           --update-interval=30 \
+           --jvm-properties=-Xmx3G \
+           --log-level=info \
+           --verbose \
+           --retry=3 \
+           --retry-delay=20
